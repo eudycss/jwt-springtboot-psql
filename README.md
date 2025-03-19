@@ -9,11 +9,11 @@ Este proyecto implementa un sistema de autenticación y autorización utilizando
 - Protección de rutas según roles
 - Encriptación BCrypt para contraseñas
 - Base de datos H2 en memoria para facilitar pruebas
-
+- Base de datos PostgreSQL 
 ## Requisitos
 
 - Java 17+
-- Maven 3.6+ o Gradle 7+
+- Maven 3.6+
 
 ## Ejecutar la aplicación
 
