@@ -11,6 +11,7 @@ import com.example.auth.repository.RoleRepository;
 import com.example.auth.repository.UserRepository;
 import com.example.auth.security.jwt.JwtUtils;
 import com.example.auth.security.services.UserDetailsImpl;
+import com.example.auth.util.PasswordUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -47,9 +48,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        // Procesar la contraseña (puede estar en texto plano o Base64)
+        String processedPassword = PasswordUtil.processPassword(loginRequest.getPassword());
 
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), processedPassword));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -70,31 +73,34 @@ public class AuthController {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                 .badRequest()
-                .body(new MessageResponse("Error: Username is already taken!"));
+                .body(new MessageResponse("Error: El nombre de usuario ya está en uso!"));
         }
 
-        // Create new user's account
+        // Procesar la contraseña (puede estar en texto plano o Base64)
+        String processedPassword = PasswordUtil.processPassword(signUpRequest.getPassword());
+
+        // Crear la cuenta de usuario con la contraseña procesada
         User user = new User(signUpRequest.getUsername(), 
-                             encoder.encode(signUpRequest.getPassword()));
+                             encoder.encode(processedPassword));
 
         Set<String> strRoles = signUpRequest.getRoles();
         Set<Role> roles = new HashSet<>();
 
         if (strRoles == null) {
             Role docenteRole = roleRepository.findByName(ERole.ROLE_DOCENTE)
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
             roles.add(docenteRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
                     case "rector":
                         Role rectorRole = roleRepository.findByName(ERole.ROLE_RECTOR)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                            .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
                         roles.add(rectorRole);
                         break;
                     default:
                         Role docenteRole = roleRepository.findByName(ERole.ROLE_DOCENTE)
-                            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                            .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
                         roles.add(docenteRole);
                 }
             });
@@ -103,6 +109,6 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity.ok(new MessageResponse("Usuario registrado exitosamente!"));
     }
 } 
