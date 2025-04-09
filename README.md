@@ -8,13 +8,12 @@ Esta API implementa un sistema de autenticación y autorización utilizando Spri
 - Autorización basada en roles (DOCENTE y RECTOR)
 - Protección de rutas según roles
 - Encriptación BCrypt para contraseñas
-- Soporte para contraseñas en texto plano o Base64
-
+- Base de datos H2 en memoria para facilitar pruebas
+- Base de datos PostgreSQL 
 ## Requisitos
 
 - Java 17+
-- Maven 3.6+ o Gradle 7+
-- PostgreSQL (o H2 para desarrollo)
+- Maven 3.6+
 
 ## Ejecutar la aplicación
 
