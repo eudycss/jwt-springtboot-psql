@@ -73,12 +73,14 @@
             <scope>runtime</scope>
         </dependency>
 
-        
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+
+        <!-- PostgreSQL Driver -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+               <scope>runtime</scope>
+			<!-- Specify the latest version -->
+		</dependency>
         
         <!-- Lombok -->
         <dependency>

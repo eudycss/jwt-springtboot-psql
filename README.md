@@ -1,6 +1,6 @@
 # Spring Boot JWT Authentication and Authorization
 
-Este proyecto implementa un sistema de autenticación y autorización utilizando Spring Boot, Spring Security y JWT (JSON Web Tokens).
+Esta API implementa un sistema de autenticación y autorización utilizando Spring Boot, Spring Security y JWT (JSON Web Tokens).
 
 ## Características
 
@@ -29,74 +29,342 @@ mvn spring-boot:run
 gradle bootRun
 ```
 
-## Rutas disponibles
+## Endpoints API
 
-- Registro: `POST /api/auth/register`
-- Login: `POST /api/auth/login`
-- Ruta protegida para DOCENTE y RECTOR: `GET /api/docente`
-- Ruta protegida solo para RECTOR: `GET /api/rector`
-- Ruta pública: `GET /api/all`
+### 1. Autenticación
 
-## Pruebas con Postman
+#### Registro de Usuario
 
-### 1. Registrar un usuario con rol DOCENTE
+**Endpoint:** `POST /api/auth/register`
 
-```
-POST /api/auth/register
-Content-Type: application/json
+**Descripción:** Crea un nuevo usuario en el sistema.
 
+**Acceso:** Público
+
+**Ejemplo de solicitud:**
+```json
 {
-    "username": "docente1",
-    "password": "123456",
-    "roles": ["docente"]
+  "username": "docente1",
+  "password": "12345678",       // Texto plano
+  "roles": ["docente"]
 }
 ```
 
-### 2. Registrar un usuario con rol RECTOR
+o usando Base64 para la contraseña:
 
-```
-POST /api/auth/register
-Content-Type: application/json
-
+```json
 {
+  "username": "rector1",
+  "password": "MTIzNDU2Nzg=",   // "12345678" en Base64
+  "roles": ["rector"]
+}
+```
+
+**Ejemplo de respuesta:**
+```json
+{
+  "message": "Usuario registrado exitosamente!"
+}
+```
+
+#### Inicio de Sesión
+
+**Endpoint:** `POST /api/auth/login`
+
+**Descripción:** Autentica al usuario y genera un token JWT.
+
+**Acceso:** Público
+
+**Ejemplo de solicitud:**
+```json
+{
+  "username": "docente1",
+  "password": "12345678"        // Texto plano
+}
+```
+
+o usando Base64:
+
+```json
+{
+  "username": "rector1",
+  "password": "MTIzNDU2Nzg="    // "12345678" en Base64
+}
+```
+
+**Ejemplo de respuesta:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "type": "Bearer",
+  "id": 1,
+  "username": "docente1",
+  "roles": ["ROLE_DOCENTE"]
+}
+```
+
+### 2. Endpoints Protegidos por Rol
+
+#### Recursos de Docente
+
+**Endpoint:** `GET /api/docente`
+
+**Descripción:** Acceso a recursos para docentes.
+
+**Acceso:** DOCENTE, RECTOR
+
+**Headers:**
+```
+Authorization: Bearer {token_jwt}
+```
+
+**Ejemplo de respuesta:**
+```
+Contenido para DOCENTES y RECTORES.
+```
+
+#### Recursos de Rector
+
+**Endpoint:** `GET /api/rector`
+
+**Descripción:** Acceso a recursos exclusivos para rectores.
+
+**Acceso:** Solo RECTOR
+
+**Headers:**
+```
+Authorization: Bearer {token_jwt}
+```
+
+**Ejemplo de respuesta:**
+```
+Contenido solo para RECTORES.
+```
+
+### 3. Gestión de Usuarios (Solo para Rectores)
+
+#### Listar Todos los Usuarios
+
+**Endpoint:** `GET /api/users/all`
+
+**Descripción:** Obtiene la lista de todos los usuarios.
+
+**Acceso:** Solo RECTOR
+
+**Headers:**
+```
+Authorization: Bearer {token_jwt}
+```
+
+**Ejemplo de respuesta:**
+```json
+[
+  {
+    "id": 1,
+    "username": "docente1",
+    "roles": ["ROLE_DOCENTE"]
+  },
+  {
+    "id": 2,
     "username": "rector1",
-    "password": "123456",
-    "roles": ["rector"]
-}
+    "roles": ["ROLE_RECTOR"]
+  }
+]
 ```
 
-### 3. Iniciar sesión y obtener token JWT
+#### Listar Docentes
 
+**Endpoint:** `GET /api/users/docentes`
+
+**Descripción:** Obtiene la lista de usuarios con rol DOCENTE.
+
+**Acceso:** Solo RECTOR
+
+**Headers:**
 ```
-POST /api/auth/login
-Content-Type: application/json
+Authorization: Bearer {token_jwt}
+```
 
-{
+**Ejemplo de respuesta:**
+```json
+[
+  {
+    "id": 1,
     "username": "docente1",
-    "password": "123456"
+    "roles": ["ROLE_DOCENTE"]
+  },
+  {
+    "id": 3,
+    "username": "docente2",
+    "roles": ["ROLE_DOCENTE"]
+  }
+]
+```
+
+#### Listar Rectores
+
+**Endpoint:** `GET /api/users/rectores`
+
+**Descripción:** Obtiene la lista de usuarios con rol RECTOR.
+
+**Acceso:** Solo RECTOR
+
+**Headers:**
+```
+Authorization: Bearer {token_jwt}
+```
+
+**Ejemplo de respuesta:**
+```json
+[
+  {
+    "id": 2,
+    "username": "rector1",
+    "roles": ["ROLE_RECTOR"]
+  }
+]
+```
+
+#### Obtener Usuario por ID
+
+**Endpoint:** `GET /api/users/{id}`
+
+**Descripción:** Obtiene información de un usuario específico.
+
+**Acceso:** Solo RECTOR
+
+**Headers:**
+```
+Authorization: Bearer {token_jwt}
+```
+
+**Ejemplo de respuesta:**
+```json
+{
+  "id": 1,
+  "username": "docente1",
+  "roles": ["ROLE_DOCENTE"]
 }
 ```
 
-La respuesta incluirá un token JWT que deberás usar para las siguientes peticiones.
+#### Actualizar Usuario
 
-### 4. Acceder a ruta protegida para DOCENTE
+**Endpoint:** `PUT /api/users/{id}`
 
+**Descripción:** Actualiza información de un usuario existente.
+
+**Acceso:** Solo RECTOR
+
+**Headers:**
 ```
-GET /api/docente
-Authorization: Bearer <token_JWT>
-```
-
-### 5. Acceder a ruta protegida para RECTOR
-
-```
-GET /api/rector
-Authorization: Bearer <token_JWT>
+Authorization: Bearer {token_jwt}
 ```
 
-## Estructura del Proyecto
+**Ejemplo de solicitud:**
+```json
+{
+  "username": "docente_nuevo",
+  "password": "87654321",       // Texto plano
+  "roles": ["docente"]
+}
+```
 
-- `models`: Entidades JPA (User, Role)
-- `repository`: Interfaces de repositorios para acceso a datos
-- `security`: Configuración de Spring Security y manejo de JWT
-- `controllers`: Controladores REST para endpoints
-- `payload`: Clases para peticiones y respuestas 
+o usando Base64:
+
+```json
+{
+  "username": "docente_nuevo",
+  "password": "ODc2NTQzMjE=",   // "87654321" en Base64
+  "roles": ["docente"]
+}
+```
+
+**Ejemplo de respuesta:**
+```json
+{
+  "id": 1,
+  "username": "docente_nuevo",
+  "roles": ["ROLE_DOCENTE"]
+}
+```
+
+#### Eliminar Usuario
+
+**Endpoint:** `DELETE /api/users/{id}`
+
+**Descripción:** Elimina un usuario del sistema.
+
+**Acceso:** Solo RECTOR
+
+**Headers:**
+```
+Authorization: Bearer {token_jwt}
+```
+
+**Ejemplo de respuesta:**
+```json
+{
+  "message": "Usuario eliminado con éxito"
+}
+```
+
+## Codificación de Contraseñas en Base64
+
+La API acepta contraseñas tanto en texto plano como en formato Base64. Para mayor seguridad, se recomienda enviar las contraseñas en Base64.
+
+### Codificar en JavaScript (navegador)
+
+```javascript
+const password = "12345678";
+const base64Password = btoa(password); // "MTIzNDU2Nzg="
+```
+
+### Codificar en JavaScript (Node.js)
+
+```javascript
+const password = "12345678";
+const base64Password = Buffer.from(password).toString('base64');
+```
+
+### Codificar en Java
+
+```java
+String password = "12345678";
+String base64Password = Base64.getEncoder().encodeToString(password.getBytes());
+```
+
+### Codificar en Python
+
+```python
+import base64
+password = "12345678"
+base64_password = base64.b64encode(password.encode()).decode()
+```
+
+## Migración a PostgreSQL
+
+Para usar PostgreSQL en lugar de H2:
+
+1. Añadir dependencia en pom.xml:
+```xml
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>runtime</scope>
+</dependency>
+```
+
+2. Configurar application.properties:
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/jwt_auth_db
+spring.datasource.username=postgres
+spring.datasource.password=tu_contraseña
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+```
+
+3. Crear base de datos en PostgreSQL:
+```sql
+CREATE DATABASE jwt_auth_db;
+``` 

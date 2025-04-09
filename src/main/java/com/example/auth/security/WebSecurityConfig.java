@@ -65,8 +65,10 @@ public class WebSecurityConfig {
                     .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/swagger-ui.html")).permitAll()
-                    .requestMatchers(new AntPathRequestMatcher("/api/docente/**")).hasAnyRole("DOCENTE", "RECTOR")
+                    //.requestMatchers(new AntPathRequestMatcher("/api/docente/**")).hasAnyRole("DOCENTE", "RECTOR")
+                    .requestMatchers(new AntPathRequestMatcher("/api/docente/**")).hasRole("DOCENTE")
                     .requestMatchers(new AntPathRequestMatcher("/api/rector/**")).hasRole("RECTOR")
+                    .requestMatchers(new AntPathRequestMatcher("/api/users/**")).hasRole("RECTOR")
                     .anyRequest().authenticated()
             );
         
