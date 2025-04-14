@@ -6,16 +6,22 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Current File",
+            "name": "Debug Spring Boot",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "com.example.auth.SpringBootJwtAuthApplication",
+            "projectName": "mi-proyecto",
+            "cwd": "${workspaceFolder}",
+            "classpath": [
+                "${workspaceFolder}/target/classes",
+                "${workspaceFolder}/target/test-classes"
+            ],
+            "vmArgs": "-Dspring.profiles.active=dev"
         },
         {
             "type": "java",
-            "name": "SpringBootJwtAuthApplication",
+            "name": "Current File",
             "request": "launch",
-            "mainClass": "com.example.auth.SpringBootJwtAuthApplication",
-            "projectName": "spring-boot-jwt-auth"
+            "mainClass": "${file}"
         }
     ]
 }

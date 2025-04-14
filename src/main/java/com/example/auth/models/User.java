@@ -31,6 +31,13 @@ public class User {
     @Size(max = 120)
     private String password;
 
+    @Size(max = 100)
+    @Column(name = "doc_nombre")
+    private String docNombre;
+
+    @Column(name = "doc_estado")
+    private String docEstado;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles", 
                joinColumns = @JoinColumn(name = "user_id"),
@@ -40,5 +47,53 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getDocNombre() {
+        return docNombre;
+    }
+
+    public void setDocNombre(String docNombre) {
+        this.docNombre = docNombre;
+    }
+
+    public String getDocEstado() {
+        return docEstado;
+    }
+
+    public void setDocEstado(String docEstado) {
+        this.docEstado = docEstado;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 } 
